@@ -3,86 +3,66 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Journal Test Site</title><script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<title>Journal Test Site</title>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <style>
-  body {
-    font-family: Georgia, 'Times New Roman', serif;
-    max-width: 700px;
-    margin: 60px auto;
-    padding: 0 20px;
-    line-height: 1.6;
-    color: #222;
-    background: #fdfcf9;
-  }
-  h1 {
-    font-size: 2em;
-    margin-bottom: 0;
-  }
-  .tagline {
-    color: #777;
-    font-style: italic;
-    margin-top: 4px;
-  }
-  .article-list {
-    margin-top: 40px;
-  }
-  .article-item {
-    padding: 16px 0;
-    border-bottom: 1px solid #ddd;
-  }
-  .article-item a {
-    text-decoration: none;
-    color: #222;
-    font-size: 1.2em;
-  }
-  .article-item a:hover {
-    color: #900;
-  }
-  footer {
-    margin-top: 60px;
-    font-size: 0.85em;
-    color: #999;
-  }
+  body { font-family: Georgia, serif; max-width: 700px; margin: 60px auto; padding: 0 20px; line-height: 1.6; color: #222; background: #fdfcf9; }
+  h1 { font-size: 2em; margin-bottom: 0; }
+  .tagline { color: #777; font-style: italic; margin-top: 4px; }
+  .article { margin-top: 40px; padding: 20px; border: 1px solid #ddd; }
+  .article h2 { margin-top: 0; }
+  .article .author { color: #777; font-style: italic; }
+  footer { margin-top: 60px; font-size: 0.85em; color: #999; }
 </style>
 </head>
 <body>
   <h1>Journal Test Site</h1>
   <p class="tagline">This is a demo — testing the publish workflow</p>
 
-  <div class="article-list" id="article-list">
-    <p>Loading articles...</p>
-  </div>
+  <div id="article-list"><p>Loading articles...</p></div>
 
-  <footer>
-    This is a temporary test site. Not the final journal.
-  </footer>
+  <footer>This is a temporary test site. Not the final journal.</footer>
 
   <script>
-    fetch('articles/index.json')
+    fetch('https://api.github.com/repos/songofawhitedovr/Tommorowwillbe/contents/articles')
       .then(res => res.json())
-      .then(articles => {
-        const list = document.getElementById('article-list');
-        if (articles.length === 0) {
-          list.innerHTML = '<p>No articles published yet.</p>';
+      .then(files => {
+        const mdFiles = files.filter(f => f.name.endsWith('.md'));
+        const container = document.getElementById('article-list');
+        if (mdFiles.length === 0) {
+          container.innerHTML = '<p>No articles published yet.</p>';
           return;
         }
-        list.innerHTML = articles.map(a =>
-          `<div class="article-item"><a href="articles/${a.slug}.html">${a.title}</a><br><small>${a.author || ''}</small></div>`
-        ).join('');
+        container.innerHTML = '';
+        mdFiles.forEach(file => {
+          fetch(file.download_url)
+            .then(res => res.text())
+            .then(text => {
+              const parts = text.split('---');
+              const meta = parts[1];
+              const body = parts.slice(2).join('---');
+              const title = (meta.match(/title:\s*(.*)/) || [])[1] || 'Untitled';
+              const author = (meta.match(/author:\s*(.*)/) || [])[1] || '';
+              const div = document.createElement('div');
+              div.className = 'article';
+              div.innerHTML = `<h2>${title}</h2><p class="author">${author}</p><p>${body.replace(/\n/g, '<br>')}</p>`;
+              container.appendChild(div);
+            });
+        });
       })
       .catch(() => {
-        document.getElementById('article-list').innerHTML = '<p>No articles published yet.</p>';
+        document.getElementById('article-list').innerHTML = '<p>Could not load articles.</p>';
       });
+
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on("init", user => {
+        if (!user) {
+          window.netlifyIdentity.on("login", () => {
+            document.location.href = "/admin/";
+          });
+        }
+      });
+    }
   </script>
-</body><script>
-  if (window.netlifyIdentity) {
-    window.netlifyIdentity.on("init", user => {
-      if (!user) {
-        window.netlifyIdentity.on("login", () => {
-          document.location.href = "/admin/";
-        });
-      }
-    });
-  }
-          </script>
+</body>
 </html>
