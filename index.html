@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Journal Test Site</title>
+<style>
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    max-width: 700px;
+    margin: 60px auto;
+    padding: 0 20px;
+    line-height: 1.6;
+    color: #222;
+    background: #fdfcf9;
+  }
+  h1 {
+    font-size: 2em;
+    margin-bottom: 0;
+  }
+  .tagline {
+    color: #777;
+    font-style: italic;
+    margin-top: 4px;
+  }
+  .article-list {
+    margin-top: 40px;
+  }
+  .article-item {
+    padding: 16px 0;
+    border-bottom: 1px solid #ddd;
+  }
+  .article-item a {
+    text-decoration: none;
+    color: #222;
+    font-size: 1.2em;
+  }
+  .article-item a:hover {
+    color: #900;
+  }
+  footer {
+    margin-top: 60px;
+    font-size: 0.85em;
+    color: #999;
+  }
+</style>
+</head>
+<body>
+  <h1>Journal Test Site</h1>
+  <p class="tagline">This is a demo — testing the publish workflow</p>
+
+  <div class="article-list" id="article-list">
+    <p>Loading articles...</p>
+  </div>
+
+  <footer>
+    This is a temporary test site. Not the final journal.
+  </footer>
+
+  <script>
+    fetch('articles/index.json')
+      .then(res => res.json())
+      .then(articles => {
+        const list = document.getElementById('article-list');
+        if (articles.length === 0) {
+          list.innerHTML = '<p>No articles published yet.</p>';
+          return;
+        }
+        list.innerHTML = articles.map(a =>
+          `<div class="article-item"><a href="articles/${a.slug}.html">${a.title}</a><br><small>${a.author || ''}</small></div>`
+        ).join('');
+      })
+      .catch(() => {
+        document.getElementById('article-list').innerHTML = '<p>No articles published yet.</p>';
+      });
+  </script>
+</body>
+</html>
