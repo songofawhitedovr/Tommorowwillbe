@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root {
     --wine: #6B1F2A;
@@ -687,6 +688,147 @@
   }
 
   loadAllContent();
+
+  // ===== PDF ISSUE DOWNLOAD =====
+  async function fetchIssueEntries() {
+    const results = await Promise.all(SECTIONS.map(async (section) => {
+      try {
+        const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${section.folder}`);
+        if (!res.ok) return [];
+        const files = await res.json();
+        if (!Array.isArray(files)) return [];
+        const mdFiles = files.filter(f => f.name.endsWith('.md'));
+        const entries = [];
+        for (const file of mdFiles) {
+          const fileRes = await fetch(file.download_url);
+          const text = await fileRes.text();
+          const parsed = parseFrontmatter(text);
+          if (parsed) entries.push({ ...parsed, key: section.key });
+        }
+        return entries;
+      } catch (err) {
+        return [];
+      }
+    }));
+    return results.flat();
+  }
+
+  function wrapText(doc, text, x, y, maxWidth, lineHeight) {
+    const lines = doc.splitTextToSize(text, maxWidth);
+    lines.forEach(line => {
+      doc.text(line, x, y);
+      y += lineHeight;
+    });
+    return y;
+  }
+
+  async function generateIssuePDF(issueName) {
+    const btn = document.getElementById('download-issue-btn');
+    const originalText = btn.textContent;
+    btn.textContent = 'Preparing...';
+
+    try {
+      const all = await fetchIssueEntries();
+      const issueEntries = all.filter(e => (e.meta.issue || 'Issue One') === issueName);
+
+      if (issueEntries.length === 0) {
+        alert('Nothing has been published in this issue yet.');
+        btn.textContent = originalText;
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 56;
+      const maxWidth = pageWidth - margin * 2;
+
+      // Cover page
+      doc.setFillColor(107, 31, 42);
+      doc.rect(0, 0, pageWidth, pageHeight, 'F');
+      doc.setTextColor(250, 246, 238);
+      doc.setFont('times', 'bold');
+      doc.setFontSize(48);
+      doc.text('Fieldnotic', pageWidth / 2, pageHeight / 2 - 40, { align: 'center' });
+      doc.setFont('times', 'italic');
+      doc.setFontSize(16);
+      doc.text('A magazine of articles, poetry, and short fiction', pageWidth / 2, pageHeight / 2, { align: 'center' });
+      doc.setFont('times', 'normal');
+      doc.setFontSize(13);
+      doc.text(issueName, pageWidth / 2, pageHeight / 2 + 40, { align: 'center' });
+
+      const order = { articles: 0, poetry: 1, fiction: 2 };
+      issueEntries.sort((a, b) => (order[a.key] ?? 9) - (order[b.key] ?? 9));
+
+      issueEntries.forEach(entry => {
+        doc.addPage();
+        doc.setFillColor(250, 246, 238);
+        doc.rect(0, 0, pageWidth, pageHeight, 'F');
+        let y = margin;
+
+        doc.setTextColor(184, 147, 90);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        const label = entry.key === 'articles' ? 'ARTICLE' : entry.key === 'poetry' ? 'POEM' : 'STORY';
+        doc.text(label, margin, y);
+        y += 26;
+
+        doc.setTextColor(107, 31, 42);
+        doc.setFont('times', 'bold');
+        doc.setFontSize(22);
+        y = wrapText(doc, entry.meta.title || 'Untitled', margin, y, maxWidth, 26);
+        y += 4;
+
+        doc.setTextColor(85, 72, 63);
+        doc.setFont('times', 'italic');
+        doc.setFontSize(11);
+        doc.text(entry.meta.author || '', margin, y);
+        y += 28;
+
+        doc.setTextColor(42, 36, 32);
+        doc.setFont('times', 'normal');
+        doc.setFontSize(11.5);
+        const bodyText = entry.body.replace(/[#*_`]/g, '');
+        const paragraphs = bodyText.split(/\n\s*\n/);
+        paragraphs.forEach(p => {
+          if (y > pageHeight - margin - 20) {
+            doc.addPage();
+            doc.setFillColor(250, 246, 238);
+            doc.rect(0, 0, pageWidth, pageHeight, 'F');
+            y = margin;
+          }
+          y = wrapText(doc, p.trim(), margin, y, maxWidth, 16);
+          y += 14;
+        });
+
+        if (entry.meta.bio) {
+          y += 10;
+          doc.setDrawColor(212, 200, 184);
+          doc.line(margin, y, margin + 80, y);
+          y += 18;
+          doc.setFont('helvetica', 'italic');
+          doc.setFontSize(9.5);
+          doc.setTextColor(85, 72, 63);
+          wrapText(doc, entry.meta.bio, margin, y, maxWidth, 13);
+        }
+      });
+
+      doc.save(`Fieldnotic - ${issueName}.pdf`);
+    } catch (err) {
+      alert('Something went wrong preparing the PDF. Please try again.');
+    }
+    btn.textContent = originalText;
+  }
+
+  const downloadBtn = document.getElementById('download-issue-btn');
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const issueName = document.getElementById('current-issue-name').textContent.trim();
+      generateIssuePDF(issueName);
+    });
+  }
 </script>
 
 </body>
