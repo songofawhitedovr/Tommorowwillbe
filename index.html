@@ -608,6 +608,85 @@
       }
     });
   }
+
+  // ===== LIVE CONTENT LOADING =====
+  const REPO = "songofawhitedovr/Tommorowwillbe";
+  const SECTIONS = [
+    { key: "articles", folder: "content/articles", feedId: "articles-feed", accent: "" },
+    { key: "poetry", folder: "content/poetry", feedId: "poetry-feed", accent: "" },
+    { key: "fiction", folder: "content/fiction", feedId: "fiction-feed", accent: "" }
+  ];
+
+  function parseFrontmatter(text) {
+    const parts = text.split('---');
+    if (parts.length < 3) return null;
+    const meta = {};
+    parts[1].split('\n').forEach(line => {
+      const idx = line.indexOf(':');
+      if (idx === -1) return;
+      const key = line.slice(0, idx).trim();
+      let val = line.slice(idx + 1).trim();
+      val = val.replace(/^['"]|['"]$/g, '');
+      meta[key] = val;
+    });
+    const body = parts.slice(2).join('---').trim();
+    return { meta, body };
+  }
+
+  function cardHTML(meta, sectionKey) {
+    const title = meta.title || 'Untitled';
+    const author = meta.author || '';
+    const excerpt = meta.excerpt || '';
+    const label = sectionKey === 'articles' ? 'Article' : sectionKey === 'poetry' ? 'Poem' : 'Story';
+    return `<div class="feature-card">
+      <span class="eyebrow">${label}${meta.issue ? ' · ' + meta.issue : ''}</span>
+      <h2>${title}</h2>
+      <div class="byline">${author}</div>
+      ${excerpt ? `<p class="excerpt">${excerpt}</p>` : ''}
+    </div>`;
+  }
+
+  async function loadSection(section) {
+    const feedEl = document.getElementById(section.feedId);
+    try {
+      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${section.folder}`);
+      if (!res.ok) return [];
+      const files = await res.json();
+      if (!Array.isArray(files)) return [];
+      const mdFiles = files.filter(f => f.name.endsWith('.md'));
+      if (mdFiles.length === 0) {
+        return [];
+      }
+      const entries = [];
+      for (const file of mdFiles) {
+        const fileRes = await fetch(file.download_url);
+        const text = await fileRes.text();
+        const parsed = parseFrontmatter(text);
+        if (parsed) entries.push({ ...parsed, key: section.key });
+      }
+      if (feedEl) {
+        feedEl.innerHTML = entries.map(e => cardHTML(e.meta, e.key)).join('');
+      }
+      return entries;
+    } catch (err) {
+      return [];
+    }
+  }
+
+  async function loadAllContent() {
+    const allResults = await Promise.all(SECTIONS.map(loadSection));
+    const homeFeed = document.getElementById('home-feed');
+    const combined = allResults.flat();
+    if (combined.length === 0) {
+      if (homeFeed) homeFeed.innerHTML = '<div class="empty-state">The first issue is being prepared. Nothing published yet, check back soon.</div>';
+      return;
+    }
+    if (homeFeed) {
+      homeFeed.innerHTML = combined.map(e => cardHTML(e.meta, e.key)).join('');
+    }
+  }
+
+  loadAllContent();
 </script>
 
 </body>
