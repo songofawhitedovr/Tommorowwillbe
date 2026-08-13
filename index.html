@@ -3,66 +3,612 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Journal Test Site</title>
+<title>Fieldnotic: A Magazine of Ideas</title>
+<meta name="description" content="Fieldnotic is a free, independent magazine publishing original articles, poetry, and short fiction across science, history, literature, philosophy, and art.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <style>
-  body { font-family: Georgia, serif; max-width: 700px; margin: 60px auto; padding: 0 20px; line-height: 1.6; color: #222; background: #fdfcf9; }
-  h1 { font-size: 2em; margin-bottom: 0; }
-  .tagline { color: #777; font-style: italic; margin-top: 4px; }
-  .article { margin-top: 40px; padding: 20px; border: 1px solid #ddd; }
-  .article h2 { margin-top: 0; }
-  .article .author { color: #777; font-style: italic; }
-  footer { margin-top: 60px; font-size: 0.85em; color: #999; }
+  :root {
+    --wine: #6B1F2A;
+    --wine-deep: #4A1520;
+    --pine: #3F5C4C;
+    --parchment: #FAF6EE;
+    --ink: #2A2420;
+    --ink-soft: #55483F;
+    --gold: #B8935A;
+    --poetry-wash: #FBF0DE;
+    --fiction-wash: #EDF1EC;
+    --rule: rgba(42,36,32,0.12);
+    --shift: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--parchment);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.65;
+    transition: background 0.6s var(--shift);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body.mode-poetry { background: var(--poetry-wash); }
+  body.mode-fiction { background: var(--fiction-wash); }
+
+  a { color: inherit; }
+
+  .eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--wine);
+  }
+
+  .eyebrow.pine { color: var(--pine); }
+
+  /* ===== MASTHEAD ===== */
+  header.masthead {
+    padding: 28px 24px 20px;
+    text-align: center;
+    border-bottom: 3px double var(--ink);
+  }
+
+  .masthead h1 {
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-size: clamp(2.6rem, 10vw, 4.2rem);
+    letter-spacing: -0.01em;
+    margin: 0;
+    color: var(--wine);
+  }
+
+  .masthead .tagline {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--ink-soft);
+    font-size: 1rem;
+    margin-top: 6px;
+    letter-spacing: 0.01em;
+  }
+
+  /* ===== NAV ===== */
+  nav.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    font-family: 'Inter', sans-serif;
+  }
+
+  nav.tabs button {
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 10px 13px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.3s var(--shift), border-color 0.3s var(--shift);
+  }
+
+  nav.tabs button:hover { color: var(--wine); }
+
+  nav.tabs button.active {
+    color: var(--wine);
+    border-bottom-color: var(--gold);
+  }
+
+  /* ===== MAIN LAYOUT ===== */
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 44px 24px 100px;
+  }
+
+  .view { display: none; animation: fadeUp 0.5s var(--shift); }
+  .view.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .view { animation: none; }
+    * { transition-duration: 0.01ms !important; }
+  }
+
+  /* ===== HOME / HERO ===== */
+  .hero {
+    text-align: center;
+    padding: 6px 0 30px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 36px;
+  }
+
+  .hero blockquote {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.1rem, 3.4vw, 1.35rem);
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0;
+    padding: 0 10px;
+  }
+
+  /* ===== DOWNLOAD ISSUE BLOCK ===== */
+  .issue-download {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 18px 20px;
+    margin-bottom: 40px;
+    background: rgba(107,31,42,0.05);
+    border: 1px solid var(--rule);
+  }
+
+  .issue-download .cover-thumb {
+    width: 56px;
+    height: 76px;
+    flex-shrink: 0;
+    background: var(--wine);
+    color: var(--parchment);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.6rem;
+    border: 2px solid var(--gold);
+  }
+
+  .issue-download .info { flex: 1; }
+
+  .issue-download .info .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .issue-download .info h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    margin: 3px 0 0;
+    font-weight: 600;
+  }
+
+  .issue-download .dl-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--wine);
+    text-decoration: none;
+    border: 1.5px solid var(--wine);
+    padding: 9px 14px;
+    white-space: nowrap;
+    transition: background 0.25s var(--shift), color 0.25s var(--shift);
+  }
+
+  .issue-download .dl-btn:hover {
+    background: var(--wine);
+    color: var(--parchment);
+  }
+
+  .feature-grid { display: grid; gap: 26px; }
+
+  .feature-card {
+    padding: 22px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .feature-card .eyebrow { margin-bottom: 8px; }
+
+  .feature-card h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.4rem;
+    margin: 0 0 8px;
+    line-height: 1.3;
+  }
+
+  .feature-card .byline {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.76rem;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+
+  .feature-card p.excerpt {
+    color: var(--ink-soft);
+    margin: 0 0 10px;
+  }
+
+  .read-link {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--wine);
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold);
+    padding-bottom: 2px;
+  }
+
+  #view-articles .read-link, #view-articles .eyebrow { color: var(--pine); }
+  #view-articles .feature-card .read-link { border-bottom-color: var(--pine); }
+
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--ink-soft);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+  }
+
+  /* ===== SECTION HEADERS ===== */
+  .section-head { margin-bottom: 32px; text-align: center; }
+
+  .section-head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 2rem;
+    margin: 10px 0 8px;
+  }
+
+  .section-head p {
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ===== SUBMISSIONS ===== */
+  .guidelines h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.15rem;
+    color: var(--wine);
+    margin: 30px 0 10px;
+  }
+
+  .guidelines p, .guidelines li { color: var(--ink-soft); }
+  .guidelines ul { padding-left: 20px; }
+
+  .stat-row {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin: 22px 0;
+    padding: 18px;
+    background: rgba(107,31,42,0.04);
+    border-left: 3px solid var(--wine);
+  }
+
+  .stat { font-family: 'Inter', sans-serif; }
+
+  .stat .num {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--wine);
+    display: block;
+  }
+
+  .stat .label {
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .cta-box {
+    margin-top: 32px;
+    padding: 26px;
+    background: var(--wine);
+    color: var(--parchment);
+    text-align: center;
+  }
+
+  .cta-box .eyebrow { color: var(--gold); }
+
+  .cta-box h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.25rem;
+    margin: 10px 0 14px;
+    color: var(--parchment);
+    word-break: break-word;
+  }
+
+  .cta-box a.email {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--parchment);
+    text-decoration: none;
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 2px;
+  }
+
+  .end-note {
+    text-align: center;
+    margin-top: 28px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+  }
+
+  .end-note a { color: var(--wine); font-weight: 600; }
+
+  /* ===== ARCHIVES ===== */
+  .archive-empty {
+    text-align: center;
+    padding: 50px 20px;
+  }
+
+  .archive-empty p {
+    color: var(--ink-soft);
+    max-width: 420px;
+    margin: 10px auto 0;
+  }
+
+  /* ===== SUPPORT ===== */
+  .support-text { text-align: center; }
+
+  .support-text p {
+    color: var(--ink-soft);
+    max-width: 480px;
+    margin: 0 auto 16px;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    text-align: center;
+    padding: 36px 24px;
+    border-top: 1px solid var(--rule);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    color: var(--ink-soft);
+  }
+
+  footer .footer-links { margin-top: 10px; }
+
+  footer .footer-links a {
+    text-decoration: none;
+    color: var(--ink-soft);
+    margin: 0 8px;
+  }
+
+  footer .footer-links a:hover { color: var(--wine); }
 </style>
 </head>
 <body>
-  <h1>Journal Test Site</h1>
-  <p class="tagline">This is a demo — testing the publish workflow</p>
 
-  <div id="article-list"><p>Loading articles...</p></div>
+<header class="masthead">
+  <h1>Fieldnotic</h1>
+  <p class="tagline">A magazine of articles, poetry, and short fiction</p>
+  <nav class="tabs">
+    <button class="tab-btn active" data-view="home" data-mode="">Home</button>
+    <button class="tab-btn" data-view="articles" data-mode="">Articles</button>
+    <button class="tab-btn" data-view="poetry" data-mode="poetry">Poetry</button>
+    <button class="tab-btn" data-view="fiction" data-mode="fiction">Fiction</button>
+    <button class="tab-btn" data-view="archives" data-mode="">Archives</button>
+    <button class="tab-btn" data-view="submissions" data-mode="">Submit</button>
+    <button class="tab-btn" data-view="support" data-mode="">Support</button>
+  </nav>
+</header>
 
-  <footer>This is a temporary test site. Not the final journal.</footer>
+<main>
 
-  <script>
-    fetch('https://api.github.com/repos/songofawhitedovr/Tommorowwillbe/contents/articles')
-      .then(res => res.json())
-      .then(files => {
-        const mdFiles = files.filter(f => f.name.endsWith('.md'));
-        const container = document.getElementById('article-list');
-        if (mdFiles.length === 0) {
-          container.innerHTML = '<p>No articles published yet.</p>';
-          return;
-        }
-        container.innerHTML = '';
-        mdFiles.forEach(file => {
-          fetch(file.download_url)
-            .then(res => res.text())
-            .then(text => {
-              const parts = text.split('---');
-              const meta = parts[1];
-              const body = parts.slice(2).join('---');
-              const title = (meta.match(/title:\s*(.*)/) || [])[1] || 'Untitled';
-              const author = (meta.match(/author:\s*(.*)/) || [])[1] || '';
-              const div = document.createElement('div');
-              div.className = 'article';
-              div.innerHTML = `<h2>${title}</h2><p class="author">${author}</p><p>${body.replace(/\n/g, '<br>')}</p>`;
-              container.appendChild(div);
-            });
+  <!-- HOME -->
+  <section class="view active" id="view-home">
+    <div class="hero">
+      <blockquote>A space for the sentence that wants to be read slowly, and the idea that doesn't fit into one discipline.</blockquote>
+    </div>
+
+    <div class="issue-download">
+      <div class="cover-thumb">F</div>
+      <div class="info">
+        <div class="label">Current Issue</div>
+        <h3 id="current-issue-name">Issue One</h3>
+      </div>
+      <a href="#" class="dl-btn" id="download-issue-btn">Download PDF</a>
+    </div>
+
+    <div class="feature-grid" id="home-feed">
+      <div class="empty-state">The first issue is being prepared. Nothing published yet, check back soon.</div>
+    </div>
+  </section>
+
+  <!-- ARTICLES -->
+  <section class="view" id="view-articles">
+    <div class="section-head">
+      <span class="eyebrow pine">Non-fiction</span>
+      <h2>Articles</h2>
+      <p>Original writing on science, history, philosophy, art, and anything worth thinking through carefully.</p>
+    </div>
+    <div class="feature-grid" id="articles-feed">
+      <div class="empty-state">No articles published yet.</div>
+    </div>
+  </section>
+
+  <!-- POETRY -->
+  <section class="view" id="view-poetry">
+    <div class="section-head">
+      <span class="eyebrow">Verse</span>
+      <h2>Poems From This Issue</h2>
+      <p>Short and long form, any style, any subject.</p>
+    </div>
+    <div class="feature-grid" id="poetry-feed">
+      <div class="empty-state">No poems published yet.</div>
+    </div>
+  </section>
+
+  <!-- FICTION -->
+  <section class="view" id="view-fiction">
+    <div class="section-head">
+      <span class="eyebrow">Narrative</span>
+      <h2>Stories From This Issue</h2>
+      <p>Original short fiction, previously unpublished.</p>
+    </div>
+    <div class="feature-grid" id="fiction-feed">
+      <div class="empty-state">No stories published yet.</div>
+    </div>
+  </section>
+
+  <!-- ARCHIVES -->
+  <section class="view" id="view-archives">
+    <div class="section-head">
+      <span class="eyebrow">Past issues</span>
+      <h2>Archives</h2>
+      <p>Every issue we've published, in one place.</p>
+    </div>
+    <div class="archive-empty">
+      <span class="eyebrow">Coming soon</span>
+      <p>The archive will fill in as issues are published. This is where every past article, poem, and story will live, organized by issue.</p>
+    </div>
+  </section>
+
+  <!-- SUBMISSIONS -->
+  <section class="view" id="view-submissions">
+    <div class="section-head">
+      <span class="eyebrow">Send your work</span>
+      <h2>Submissions &amp; Guidelines</h2>
+      <p>We read year-round. We are small, careful, and unhurried.</p>
+    </div>
+
+    <div class="cta-box" style="margin-top:0; margin-bottom:28px;">
+      <span class="eyebrow">Send your work to</span>
+      <h3 id="submit-email-top">fieldnoticmagazine@gmail.com</h3>
+      <a class="email" href="mailto:fieldnoticmagazine@gmail.com">Open email</a>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat"><span class="num">4</span><span class="label">Issues / year</span></div>
+      <div class="stat"><span class="num">4</span><span class="label">Articles / year</span></div>
+      <div class="stat"><span class="num">8–16</span><span class="label">Poems / year</span></div>
+      <div class="stat"><span class="num">4</span><span class="label">Stories / year</span></div>
+    </div>
+
+    <div class="guidelines">
+      <h3>What we're looking for</h3>
+      <p>Original work only. Articles on any subject approached with rigor and curiosity, poetry in any form, and short fiction that hasn't appeared anywhere else. We read across science, history, literature, philosophy, and art, and we're just as interested in the space between disciplines as within them.</p>
+
+      <h3>Each issue includes</h3>
+      <ul>
+        <li>1 article</li>
+        <li>2 to 4 poems</li>
+        <li>1 short story</li>
+      </ul>
+      <p>We publish 4 issues a year, on a rolling schedule, we'll announce dates as we settle into a rhythm.</p>
+
+      <h3>Length guidelines</h3>
+      <ul>
+        <li><strong>Articles:</strong> 1,200 to 2,500 words</li>
+        <li><strong>Short fiction:</strong> 1,500 to 3,500 words</li>
+        <li><strong>Poetry:</strong> no strict limit, but keep it under roughly 60 lines</li>
+      </ul>
+
+      <h3>How to submit</h3>
+      <ul>
+        <li><strong>Articles:</strong> one per submission.</li>
+        <li><strong>Poetry:</strong> up to 10 poems in a single submission.</li>
+        <li><strong>Short fiction:</strong> one story per submission.</li>
+      </ul>
+      <p>Send your work as a plain document (.docx or .pdf) to the email above. Include a short author bio, 2 to 3 sentences, third person, telling readers a little about who you are. We'll publish this alongside your work.</p>
+
+      <h3>Response time</h3>
+      <p>You'll receive an acknowledgment of receipt within 7 days. Full editorial decisions may take longer, we're a small team reading carefully, not a mass operation.</p>
+
+      <h3>Rights</h3>
+      <p>You retain full copyright of your work. Publication with Fieldnotic is non-exclusive, you're free to republish your work anywhere else, before or after it appears with us.</p>
+
+      <h3>A note on AI</h3>
+      <p>Fieldnotic is a space for human voices and human thought. We're not interested in AI-generated writing, no matter how polished it might be. We want your sentences, your instincts, your particular way of seeing things, and we'll always prefer something a little rough and real over something smooth and synthetic.</p>
+    </div>
+
+    <div class="end-note">
+      Questions before submitting? Write to us at <a href="mailto:fieldnoticmagazine@gmail.com">fieldnoticmagazine@gmail.com</a>
+    </div>
+  </section>
+
+  <!-- SUPPORT -->
+  <section class="view" id="view-support">
+    <div class="section-head">
+      <span class="eyebrow">Keep this going</span>
+      <h2>Support Fieldnotic</h2>
+    </div>
+    <div class="support-text">
+      <p>Fieldnotic is free to read and free to submit to. We don't run ads, and we don't charge writers. If this magazine has given you something worth your time, and you'd like to help keep it running, we'd be glad to hear from you.</p>
+      <p>For now, reach out directly and we'll figure out the simplest way for you to help.</p>
+    </div>
+    <div class="cta-box">
+      <span class="eyebrow">Get in touch</span>
+      <h3>fieldnoticmagazine@gmail.com</h3>
+      <a class="email" href="mailto:fieldnoticmagazine@gmail.com">Open email</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div>Fieldnotic. Free. Independent. Unhurried.</div>
+  <div class="footer-links">
+    <a href="mailto:fieldnoticmagazine@gmail.com">Contact</a>
+    <a href="/admin/">Editor Login</a>
+  </div>
+</footer>
+
+<script>
+  const buttons = document.querySelectorAll('.tab-btn');
+  const views = document.querySelectorAll('.view');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      views.forEach(v => v.classList.remove('active'));
+      document.getElementById('view-' + btn.dataset.view).classList.add('active');
+
+      document.body.classList.remove('mode-poetry', 'mode-fiction');
+      if (btn.dataset.mode) {
+        document.body.classList.add('mode-' + btn.dataset.mode);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on("init", user => {
+      if (!user) {
+        window.netlifyIdentity.on("login", () => {
+          document.location.href = "/admin/";
         });
-      })
-      .catch(() => {
-        document.getElementById('article-list').innerHTML = '<p>Could not load articles.</p>';
-      });
+      }
+    });
+  }
+</script>
 
-    if (window.netlifyIdentity) {
-      window.netlifyIdentity.on("init", user => {
-        if (!user) {
-          window.netlifyIdentity.on("login", () => {
-            document.location.href = "/admin/";
-          });
-        }
-      });
-    }
-  </script>
 </body>
 </html>
