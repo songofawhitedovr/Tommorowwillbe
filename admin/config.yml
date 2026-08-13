@@ -2,17 +2,53 @@ backend:
   name: git-gateway
   branch: main
 
-media_folder: "articles/images"
-public_folder: "articles/images"
+media_folder: "content/images"
+public_folder: "/content/images"
 
 collections:
   - name: "articles"
     label: "Articles"
-    folder: "articles"
+    label_singular: "Article"
+    folder: "content/articles"
     create: true
     slug: "{{slug}}"
     fields:
       - { label: "Title", name: "title", widget: "string" }
-      - { label: "Author", name: "author", widget: "string" }
+      - { label: "Author Name", name: "author", widget: "string" }
+      - { label: "Author Bio", name: "bio", widget: "text", required: false }
+      - { label: "Issue", name: "issue", widget: "string", default: "Issue One" }
+      - { label: "Publish Date", name: "date", widget: "datetime", default: "" }
       - { label: "Cover Image", name: "image", widget: "image", required: false }
+      - { label: "Excerpt", name: "excerpt", widget: "text" }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "poetry"
+    label: "Poetry"
+    label_singular: "Poem"
+    folder: "content/poetry"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Author Name", name: "author", widget: "string" }
+      - { label: "Author Bio", name: "bio", widget: "text", required: false }
+      - { label: "Issue", name: "issue", widget: "string", default: "Issue One" }
+      - { label: "Publish Date", name: "date", widget: "datetime", default: "" }
+      - { label: "Excerpt", name: "excerpt", widget: "text" }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "fiction"
+    label: "Short Fiction"
+    label_singular: "Story"
+    folder: "content/fiction"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Author Name", name: "author", widget: "string" }
+      - { label: "Author Bio", name: "bio", widget: "text", required: false }
+      - { label: "Issue", name: "issue", widget: "string", default: "Issue One" }
+      - { label: "Publish Date", name: "date", widget: "datetime", default: "" }
+      - { label: "Cover Image", name: "image", widget: "image", required: false }
+      - { label: "Excerpt", name: "excerpt", widget: "text" }
       - { label: "Body", name: "body", widget: "markdown" }
