@@ -10,6 +10,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<meta property="og:type" content="website">
+<meta property="og:title" content="Fieldnotic: A Magazine of Ideas">
+<meta property="og:description" content="A free, independent magazine of poetry, short fiction, and articles from writers around the world. Submissions are open.">
+<meta name="twitter:card" content="summary">
 <style>
   :root {
     --wine: #6B1F2A;
@@ -403,6 +408,187 @@
   }
 
   footer .footer-links a:hover { color: var(--wine); }
+
+  /* ===== READABLE CARDS, POEMS, READER, SHARE ===== */
+  .read-link { text-transform: none; letter-spacing: 0.01em; font-size: 0.84rem; font-weight: 500; }
+  .feature-card .mins { font-family: 'Inter', sans-serif; font-size: 0.76rem; color: var(--ink-soft); margin-left: 12px; }
+
+  .feature-card.clickable {
+    cursor: pointer;
+    margin: 0 -16px;
+    padding: 24px 16px;
+    transition: background 0.25s var(--shift);
+  }
+  .feature-card.clickable:hover { background: rgba(107,31,42,0.045); }
+  .feature-card.clickable:focus-visible, .pill:focus-visible, .reader-bar button:focus-visible {
+    outline: 2px solid var(--gold); outline-offset: 3px;
+  }
+
+  .pill {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--wine);
+    background: transparent;
+    border: 1.5px solid var(--wine);
+    border-radius: 999px;
+    padding: 9px 17px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: background 0.2s var(--shift), color 0.2s var(--shift);
+  }
+  .pill:hover { background: var(--wine); color: var(--parchment); }
+  .pill.solid { background: var(--wine); color: var(--parchment); }
+  .pill.solid:hover { background: var(--wine-deep); }
+  .pill.ghost { border-color: transparent; padding-left: 4px; padding-right: 4px; text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: 5px; }
+  .pill.ghost:hover { background: transparent; color: var(--wine-deep); }
+
+  /* Full poem shown on the Poetry tab */
+  .poem-card {
+    background: rgba(255,255,255,0.5);
+    border: 1px solid rgba(184,147,90,0.4);
+    padding: 40px 30px 26px;
+    margin-bottom: 30px;
+  }
+  .poem-card h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.7rem;
+    line-height: 1.2;
+    margin: 0 0 6px;
+    color: var(--wine);
+  }
+  .poem-card .by { font-style: italic; color: var(--ink-soft); margin-bottom: 26px; }
+  .poem-text .stanza { margin: 0 0 1.55em; font-size: 1.1rem; line-height: 1.95; }
+  .poem-card .bio {
+    margin: 30px 0 0; padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    font-style: italic; color: var(--ink-soft); font-size: 0.94rem; line-height: 1.65;
+  }
+  .poem-foot { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 22px; }
+
+  /* Reading view */
+  .reader {
+    position: fixed; inset: 0; z-index: 1000;
+    display: none; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    background: var(--parchment); --reader-bg: var(--parchment);
+  }
+  .reader.open { display: block; animation: readerIn 0.4s var(--shift); }
+  .reader.m-poetry { background: var(--poetry-wash); --reader-bg: var(--poetry-wash); }
+  .reader.m-fiction { background: var(--fiction-wash); --reader-bg: var(--fiction-wash); }
+  @keyframes readerIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  .reader-bar {
+    position: sticky; top: 0; z-index: 2;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 18px;
+    background: var(--reader-bg);
+    border-bottom: 1px solid var(--rule);
+  }
+  .reader-brand { font-family: 'Fraunces', serif; font-weight: 600; color: var(--wine); font-size: 1.15rem; }
+  .reader-inner { max-width: 620px; margin: 0 auto; padding: 46px 24px 100px; }
+  .r-kind { font-family: 'Fraunces', serif; font-style: italic; color: var(--gold); font-size: 1.05rem; margin-bottom: 10px; }
+  .reader h1 {
+    font-family: 'Fraunces', serif; font-weight: 600;
+    font-size: clamp(2rem, 7vw, 3rem); line-height: 1.12;
+    margin: 0 0 12px; color: var(--wine);
+  }
+  .r-by { font-style: italic; color: var(--ink-soft); font-size: 1.1rem; }
+  .r-rule { width: 48px; height: 2px; background: var(--gold); margin: 26px 0 34px; }
+  .r-cover { width: 100%; display: block; margin: 0 0 30px; }
+  .r-body p { margin: 0 0 1.15em; font-size: 1.12rem; line-height: 1.8; }
+  .r-body .stanza { margin: 0 0 1.7em; font-size: 1.15rem; line-height: 1.95; }
+  .r-body h3 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 1.4rem; color: var(--wine); margin: 1.8em 0 0.6em; }
+  .r-body blockquote { margin: 1.4em 0; padding-left: 18px; border-left: 2px solid var(--gold); font-style: italic; color: var(--ink-soft); }
+  .r-body.fiction p:first-of-type::first-letter,
+  .r-body.articles p:first-of-type::first-letter {
+    float: left; font-family: 'Fraunces', serif; font-weight: 600;
+    font-size: 3.7em; line-height: 0.85; padding: 0.06em 0.1em 0 0; color: var(--wine);
+  }
+  .r-bio { margin-top: 46px; padding-top: 18px; border-top: 1px solid var(--rule); font-style: italic; color: var(--ink-soft); font-size: 0.98rem; line-height: 1.65; }
+  .share-box { margin-top: 46px; padding-top: 24px; border-top: 1px solid var(--rule); }
+  .share-title { font-family: 'Fraunces', serif; font-size: 1.3rem; color: var(--wine); margin-bottom: 6px; }
+  .share-note { color: var(--ink-soft); font-size: 0.92rem; margin: 0 0 16px; }
+  .share-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 28px;
+    transform: translate(-50%, 20px);
+    background: var(--wine-deep); color: var(--parchment);
+    padding: 11px 20px; font-family: 'Inter', sans-serif; font-size: 0.85rem;
+    opacity: 0; pointer-events: none; z-index: 6000;
+    transition: opacity 0.25s, transform 0.25s;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  /* ===== PDF PAGES (drawn off-screen, then turned into the PDF) ===== */
+  #pdf-stage { position: absolute; left: 0; top: 0; width: 794px; height: 1123px; z-index: 1; }
+  #pdf-overlay {
+    position: fixed; inset: 0; z-index: 5000; background: #FAF6EE;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; padding: 30px; text-align: center;
+    font-family: 'Fraunces', serif; font-size: 1.5rem; color: #6B1F2A;
+  }
+  #pdf-overlay .pg { font-family: 'Inter', sans-serif; font-size: 0.82rem; color: #55483F; }
+
+  .pp {
+    position: absolute; left: 0; top: 0; width: 794px; height: 1123px;
+    overflow: hidden; box-sizing: border-box; display: none;
+    background: #FAF6EE; color: #2A2420;
+    font-family: 'Source Serif 4', Georgia, serif;
+  }
+  .pp.cover, .pp.back { background: radial-gradient(ellipse 70% 55% at 30% 42%, #7d2a37 0%, #6B1F2A 52%, #4d1420 100%); }
+  .pp .frame { position: absolute; left: 34px; top: 34px; right: 34px; bottom: 34px; border: 1px solid rgba(184,147,90,0.85); }
+  .pp .frame2 { position: absolute; left: 43px; top: 43px; right: 43px; bottom: 43px; border: 1px solid rgba(184,147,90,0.4); }
+
+  .pp .cv-lily { position: absolute; left: 62px; top: 150px; height: 830px; }
+  .pp .cv-title { position: absolute; left: 342px; right: 56px; top: 410px; }
+  .pp .cv-issue { font-family: 'Fraunces', serif; font-style: italic; font-size: 24px; color: #B8935A; margin-bottom: 8px; }
+  .pp .cv-title h1 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 76px; line-height: 1; letter-spacing: -0.01em; color: #FAF6EE; margin: 0; white-space: nowrap; }
+  .pp .cv-rule { width: 250px; height: 1px; background: #B8935A; margin: 28px 0 24px; }
+  .pp .cv-tag { font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; line-height: 1.45; color: #EBDCC8; margin: 0; }
+  .pp .cv-foot { position: absolute; left: 0; right: 0; bottom: 78px; text-align: center; font-style: italic; font-size: 15px; color: #D9C7AE; }
+
+  .pp.toc { padding: 150px 110px 0 120px; }
+  .pp .toc-issue { font-family: 'Fraunces', serif; font-style: italic; font-size: 21px; color: #B8935A; margin-bottom: 8px; }
+  .pp.toc h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 58px; line-height: 1.05; color: #6B1F2A; margin: 0 0 20px; }
+  .pp .toc-rule { width: 56px; height: 2px; background: #B8935A; margin-bottom: 40px; }
+  .pp .grp { font-family: 'Fraunces', serif; font-style: italic; font-size: 21px; color: #B8935A; margin: 34px 0 14px; }
+  .pp .row { display: flex; align-items: baseline; gap: 12px; }
+  .pp .row .t { font-family: 'Fraunces', serif; font-size: 27px; line-height: 1.25; color: #2A2420; }
+  .pp .row .lead { flex: 1; border-bottom: 2px dotted rgba(42,36,32,0.28); min-width: 20px; transform: translateY(-6px); }
+  .pp .row .n { font-family: 'Fraunces', serif; font-size: 23px; color: #6B1F2A; }
+  .pp .au { font-style: italic; font-size: 17px; color: #55483F; margin: 2px 0 18px; }
+
+  .pp.piece.poetry { background: #FBF0DE; }
+  .pp.piece.fiction { background: #EDF1EC; }
+  .pp .runhead {
+    position: absolute; top: 58px; left: 110px; right: 110px;
+    display: flex; justify-content: space-between;
+    font-family: 'Fraunces', serif; font-style: italic; font-size: 15px; color: #8a7a6c;
+    padding-bottom: 12px; border-bottom: 1px solid rgba(184,147,90,0.55);
+  }
+  .pp .pbody { position: absolute; top: 150px; left: 110px; right: 110px; bottom: 118px; overflow: hidden; }
+  .pp .pfoot { position: absolute; bottom: 56px; left: 0; right: 0; text-align: center; font-family: 'Fraunces', serif; font-size: 16px; color: #6B1F2A; }
+  .pp .kind { font-family: 'Fraunces', serif; font-style: italic; font-size: 19px; color: #B8935A; margin-bottom: 14px; }
+  .pp h2.ptitle { font-family: 'Fraunces', serif; font-weight: 600; font-size: 46px; line-height: 1.1; color: #6B1F2A; margin: 0 0 14px; }
+  .pp .pauthor { font-style: italic; font-size: 21px; color: #55483F; margin-bottom: 20px; }
+  .pp .prule { width: 56px; height: 2px; background: #B8935A; margin-bottom: 40px; }
+  .pp .stanza { font-size: 21px; line-height: 1.75; margin: 0 0 1.5em; }
+  .pp .pbody p { font-size: 19px; line-height: 1.72; margin: 0 0 14px; }
+  .pp .pbody h3 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 26px; color: #6B1F2A; margin: 26px 0 12px; }
+  .pp .pbody blockquote { margin: 18px 0; padding-left: 20px; border-left: 2px solid #B8935A; font-style: italic; color: #55483F; font-size: 19px; line-height: 1.7; }
+  .pp .drop { float: left; font-family: 'Fraunces', serif; font-weight: 600; font-size: 74px; line-height: 0.82; padding: 8px 10px 0 0; color: #6B1F2A; }
+  .pp .pbio { margin-top: 30px; padding-top: 16px; border-top: 1px solid rgba(184,147,90,0.6); font-style: italic; font-size: 16px; line-height: 1.6; color: #55483F; width: 74%; }
+
+  .pp .bk-in { position: absolute; left: 130px; right: 130px; top: 290px; text-align: center; }
+  .pp .bk-in h2 { font-family: 'Fraunces', serif; font-style: italic; font-weight: 500; font-size: 52px; line-height: 1.15; color: #FAF6EE; margin: 0 0 28px; }
+  .pp .bk-in p { font-size: 20px; line-height: 1.6; color: #EBDCC8; margin: 0 0 14px; }
+  .pp .bk-in .em { font-family: 'Fraunces', serif; font-size: 30px; color: #E0BF86; margin: 40px 0 8px; }
+  .pp .bk-site { position: absolute; left: 0; right: 0; bottom: 90px; text-align: center; font-family: 'Fraunces', serif; font-style: italic; font-size: 17px; color: #D9C7AE; }
+
 </style>
 </head>
 <body>
@@ -581,6 +767,16 @@
   </div>
 </footer>
 
+<div class="reader" id="reader" role="dialog" aria-modal="true" aria-label="Reading view">
+  <div class="reader-bar">
+    <button class="pill" id="reader-close" type="button">Back to the magazine</button>
+    <span class="reader-brand">Fieldnotic</span>
+  </div>
+  <article class="reader-inner" id="reader-content"></article>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+
 <script>
   const buttons = document.querySelectorAll('.tab-btn');
   const views = document.querySelectorAll('.view');
@@ -609,109 +805,330 @@
     });
   }
 
-  // ===== LIVE CONTENT LOADING =====
+  // ===== LIVE CONTENT =====
   const REPO = "songofawhitedovr/Tommorowwillbe";
   const SECTIONS = [
-    { key: "poetry", folder: "content/poetry", feedId: "poetry-feed", accent: "" },
-    { key: "fiction", folder: "content/fiction", feedId: "fiction-feed", accent: "" },
-    { key: "articles", folder: "content/articles", feedId: "articles-feed", accent: "" }
+    { key: "poetry", folder: "content/poetry" },
+    { key: "fiction", folder: "content/fiction" },
+    { key: "articles", folder: "content/articles" }
   ];
+  const TYPE = {
+    poetry:   { one: 'Poem',    read: 'Read the poem' },
+    fiction:  { one: 'Story',   read: 'Read the story' },
+    articles: { one: 'Article', read: 'Read the article' }
+  };
+  let ENTRIES = [];
+  let openedInApp = false;
+  const baseTitle = document.title;
 
-  function parseFrontmatter(text) {
-    const parts = text.split('---');
-    if (parts.length < 3) return null;
-    const meta = {};
-    parts[1].split('\n').forEach(line => {
-      const idx = line.indexOf(':');
-      if (idx === -1) return;
-      const key = line.slice(0, idx).trim();
-      let val = line.slice(idx + 1).trim();
-      val = val.replace(/^['"]|['"]$/g, '');
-      meta[key] = val;
-    });
-    const body = parts.slice(2).join('---').trim();
-    return { meta, body };
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
 
-  function cardHTML(meta, sectionKey) {
-    const title = meta.title || 'Untitled';
-    const author = meta.author || '';
-    const excerpt = meta.excerpt || '';
-    const label = sectionKey === 'articles' ? 'Article' : sectionKey === 'poetry' ? 'Poem' : 'Story';
-    return `<div class="feature-card">
-      <span class="eyebrow">${label}${meta.issue ? ' · ' + meta.issue : ''}</span>
-      <h2>${title}</h2>
-      <div class="byline">${author}</div>
-      ${excerpt ? `<p class="excerpt">${excerpt}</p>` : ''}
-    </div>`;
+  // Reads the settings block at the top of each saved piece (handles folded and quoted values)
+  function parseFrontmatter(text) {
+    const m = String(text).replace(/\r/g, '').match(/^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/);
+    if (!m) return null;
+    const meta = {};
+    const lines = m[1].split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const km = lines[i].match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
+      if (!km) continue;
+      const key = km[1];
+      let val = km[2].trim();
+      if (/^[>|][+-]?$/.test(val)) {
+        const folded = val[0] === '>';
+        const block = [];
+        while (i + 1 < lines.length && (/^\s/.test(lines[i + 1]) || lines[i + 1].trim() === '')) {
+          i++;
+          block.push(lines[i]);
+        }
+        const indents = block.filter(l => l.trim()).map(l => l.match(/^\s*/)[0].length);
+        const cut = indents.length ? Math.min(...indents) : 0;
+        const rows = block.map(l => l.slice(cut));
+        if (folded) {
+          val = rows.join('\n').replace(/([^\n])\n(?!\n)/g, '$1 ').replace(/\n\n/g, '\n').trim();
+        } else {
+          val = rows.join('\n').trim();
+        }
+      } else {
+        while (i + 1 < lines.length && /^\s+\S/.test(lines[i + 1]) && !/^\s*[A-Za-z0-9_-]+:\s/.test(lines[i + 1])) {
+          i++;
+          val += ' ' + lines[i].trim();
+        }
+        if (/^'.*'$/.test(val)) val = val.slice(1, -1).replace(/''/g, "'");
+        else if (/^".*"$/.test(val)) { try { val = JSON.parse(val); } catch (_) { val = val.slice(1, -1); } }
+      }
+      meta[key] = val;
+    }
+    return { meta, body: m[2].trim() };
+  }
+
+  function byNewest(a, b) {
+    return (new Date(b.meta.date) - new Date(a.meta.date)) || 0;
   }
 
   async function loadSection(section) {
-    const feedEl = document.getElementById(section.feedId);
     try {
       const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${section.folder}`);
       if (!res.ok) return [];
       const files = await res.json();
       if (!Array.isArray(files)) return [];
       const mdFiles = files.filter(f => f.name.endsWith('.md'));
-      if (mdFiles.length === 0) {
-        return [];
-      }
-      const entries = [];
-      for (const file of mdFiles) {
-        const fileRes = await fetch(file.download_url);
-        const text = await fileRes.text();
-        const parsed = parseFrontmatter(text);
-        if (parsed) entries.push({ ...parsed, key: section.key });
-      }
-      if (feedEl) {
-        feedEl.innerHTML = entries.map(e => cardHTML(e.meta, e.key)).join('');
-      }
-      return entries;
-    } catch (err) {
+      const entries = await Promise.all(mdFiles.map(async f => {
+        try {
+          const r = await fetch(f.download_url);
+          const parsed = parseFrontmatter(await r.text());
+          if (!parsed) return null;
+          const slug = f.name.replace(/\.md$/, '');
+          return { ...parsed, key: section.key, slug, id: section.key + '/' + slug };
+        } catch (_) { return null; }
+      }));
+      return entries.filter(Boolean).sort(byNewest);
+    } catch (_) {
       return [];
     }
   }
 
+  // ----- Turning the saved text into readable blocks -----
+  function inline(t) {
+    t = esc(t);
+    t = t.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    t = t.replace(/(^|[\s(])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+    t = t.replace(/(^|[\s(])_([^_\n]+)_/g, '$1<em>$2</em>');
+    return t;
+  }
+
+  function parseBlocks(e) {
+    const text = (e.body || '').replace(/\r/g, '').replace(/\\\n/g, '\n').replace(/[ ]{2,}\n/g, '\n').trim();
+    if (!text) return [];
+    const chunks = text.split(/\n\s*\n/);
+    if (e.key === 'poetry') {
+      return chunks.map(c => ({ kind: 'stanza', html: c.split('\n').map(l => inline(l.trim())).join('<br>') }));
+    }
+    const out = [];
+    chunks.forEach(c => {
+      const t = c.trim();
+      if (!t) return;
+      let m;
+      if ((m = t.match(/^#{1,6}\s+(.*)$/))) out.push({ kind: 'h', html: inline(m[1]) });
+      else if (/^>\s?/.test(t)) out.push({ kind: 'quote', html: inline(t.replace(/^>\s?/gm, '').replace(/\n/g, ' ')) });
+      else if (/^(-{3,}|\*{3,})$/.test(t)) out.push({ kind: 'hr', html: '' });
+      else out.push({ kind: 'p', html: inline(t.replace(/\n/g, ' ')) });
+    });
+    return out;
+  }
+
+  function bodyHTML(e) {
+    return parseBlocks(e).map(b => {
+      if (b.kind === 'stanza') return `<div class="stanza">${b.html}</div>`;
+      if (b.kind === 'h') return `<h3>${b.html}</h3>`;
+      if (b.kind === 'quote') return `<blockquote>${b.html}</blockquote>`;
+      if (b.kind === 'hr') return '<hr>';
+      return `<p>${b.html}</p>`;
+    }).join('');
+  }
+
+  function readMins(e) {
+    const words = (e.body || '').split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.round(words / 220));
+  }
+
+  // ----- Cards and poems -----
+  function cardHTML(e) {
+    const t = TYPE[e.key], m = e.meta;
+    const mins = e.key === 'poetry' ? '' : `<span class="mins">${readMins(e)} minute read</span>`;
+    return `<article class="feature-card clickable" role="button" tabindex="0" data-open="${esc(e.id)}">
+      <span class="eyebrow">${t.one}${m.issue ? ', ' + esc(m.issue) : ''}</span>
+      <h2>${esc(m.title || 'Untitled')}</h2>
+      <div class="byline">${esc(m.author || '')}</div>
+      ${m.excerpt ? `<p class="excerpt">${esc(m.excerpt)}</p>` : ''}
+      <span class="read-link">${t.read}</span>${mins}
+    </article>`;
+  }
+
+  function poemCardHTML(e) {
+    const m = e.meta;
+    return `<article class="poem-card">
+      <h3>${esc(m.title || 'Untitled')}</h3>
+      <div class="by">${esc(m.author || '')}</div>
+      <div class="poem-text">${bodyHTML(e)}</div>
+      ${m.bio ? `<p class="bio">${esc(m.bio)}</p>` : ''}
+      <div class="poem-foot">
+        <button class="pill solid" type="button" data-share="${esc(e.id)}">Share</button>
+        <button class="pill ghost" type="button" data-open="${esc(e.id)}">Open on its own page</button>
+      </div>
+    </article>`;
+  }
+
+  function renderAll() {
+    const by = k => ENTRIES.filter(e => e.key === k);
+    const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+    set('home-feed', ENTRIES.length
+      ? ENTRIES.map(cardHTML).join('')
+      : '<div class="empty-state">The first issue is being prepared. Nothing published yet, check back soon.</div>');
+    set('poetry-feed', by('poetry').length ? by('poetry').map(poemCardHTML).join('') : '<div class="empty-state">No poems published yet.</div>');
+    set('fiction-feed', by('fiction').length ? by('fiction').map(cardHTML).join('') : '<div class="empty-state">No stories published yet.</div>');
+    set('articles-feed', by('articles').length ? by('articles').map(cardHTML).join('') : '<div class="empty-state">No articles published yet.</div>');
+  }
+
   async function loadAllContent() {
-    const allResults = await Promise.all(SECTIONS.map(loadSection));
-    const homeFeed = document.getElementById('home-feed');
-    const combined = allResults.flat();
-    if (combined.length === 0) {
-      if (homeFeed) homeFeed.innerHTML = '<div class="empty-state">The first issue is being prepared. Nothing published yet, check back soon.</div>';
-      return;
+    const results = await Promise.all(SECTIONS.map(loadSection));
+    ENTRIES = results.flat();
+    renderAll();
+  }
+
+  // ----- Sharing -----
+  function hashFor(e) { return e.key + '/' + encodeURIComponent(e.slug); }
+  function shareUrl(e) { return location.origin + location.pathname + '#' + hashFor(e); }
+  function shareText(e) {
+    const m = e.meta;
+    return '\u201C' + (m.title || 'Untitled') + '\u201D' + (m.author ? ' by ' + m.author : '') + ' in Fieldnotic';
+  }
+  function findEntry(id) { return ENTRIES.find(x => x.id === id); }
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  async function copyLink(e) {
+    const url = shareUrl(e);
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch (_) {
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (__) {}
+      document.body.removeChild(ta);
     }
-    if (homeFeed) {
-      homeFeed.innerHTML = combined.map(e => cardHTML(e.meta, e.key)).join('');
+    toast('Link copied');
+  }
+
+  async function doShare(e) {
+    if (navigator.share) {
+      try { await navigator.share({ title: e.meta.title || 'Fieldnotic', text: shareText(e), url: shareUrl(e) }); } catch (_) {}
+    } else {
+      openEntry(e.id, true);
     }
   }
 
-  loadAllContent();
-
-  // ===== PDF ISSUE DOWNLOAD =====
-  async function fetchIssueEntries() {
-    const results = await Promise.all(SECTIONS.map(async (section) => {
-      try {
-        const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${section.folder}`);
-        if (!res.ok) return [];
-        const files = await res.json();
-        if (!Array.isArray(files)) return [];
-        const mdFiles = files.filter(f => f.name.endsWith('.md'));
-        const entries = [];
-        for (const file of mdFiles) {
-          const fileRes = await fetch(file.download_url);
-          const text = await fileRes.text();
-          const parsed = parseFrontmatter(text);
-          if (parsed) entries.push({ ...parsed, key: section.key });
-        }
-        return entries;
-      } catch (err) {
-        return [];
-      }
-    }));
-    return results.flat();
+  function shareBoxHTML(e) {
+    const url = shareUrl(e), text = shareText(e), enc = encodeURIComponent;
+    const links = [
+      ['WhatsApp', 'https://wa.me/?text=' + enc(text + ' ' + url)],
+      ['Facebook', 'https://www.facebook.com/sharer/sharer.php?u=' + enc(url)],
+      ['X', 'https://twitter.com/intent/tweet?text=' + enc(text) + '&url=' + enc(url)],
+      ['Email', 'mailto:?subject=' + enc(text) + '&body=' + enc(text + '\n\n' + url)]
+    ];
+    const native = navigator.share ? `<button class="pill solid" type="button" data-share="${esc(e.id)}">Share</button>` : '';
+    return `<div class="share-box" id="share-box">
+      <div class="share-title">Share this ${TYPE[e.key].one.toLowerCase()}</div>
+      <p class="share-note">Know someone who would love this? Send it their way. Every share helps a writer find readers.</p>
+      <div class="share-row">${native}
+        ${links.map(l => `<a class="pill" target="_blank" rel="noopener" href="${esc(l[1])}">${l[0]}</a>`).join('')}
+        <button class="pill" type="button" data-copy="${esc(e.id)}">Copy link</button>
+      </div>
+    </div>`;
   }
 
+  // ----- Reading view -----
+  const readerEl = document.getElementById('reader');
+  const readerContent = document.getElementById('reader-content');
+
+  function readerHTML(e) {
+    const m = e.meta, t = TYPE[e.key];
+    return `${m.image ? `<img class="r-cover" src="${esc(m.image)}" alt="">` : ''}
+      <div class="r-kind">${t.one}${m.issue ? ', ' + esc(m.issue) : ''}</div>
+      <h1>${esc(m.title || 'Untitled')}</h1>
+      <div class="r-by">${esc(m.author || '')}</div>
+      <div class="r-rule"></div>
+      <div class="r-body ${e.key}">${bodyHTML(e)}</div>
+      ${m.bio ? `<div class="r-bio">${esc(m.bio)}</div>` : ''}
+      ${shareBoxHTML(e)}`;
+  }
+
+  function showReader(e, toShare) {
+    readerContent.innerHTML = readerHTML(e);
+    readerEl.className = 'reader open' + (e.key === 'poetry' ? ' m-poetry' : e.key === 'fiction' ? ' m-fiction' : '');
+    document.body.style.overflow = 'hidden';
+    document.title = (e.meta.title || 'Fieldnotic') + ' | Fieldnotic';
+    readerEl.scrollTop = 0;
+    if (toShare) {
+      const box = document.getElementById('share-box');
+      if (box) readerEl.scrollTop = box.offsetTop - 80;
+    }
+    document.getElementById('reader-close').focus({ preventScroll: true });
+  }
+
+  function hideReader() {
+    readerEl.className = 'reader';
+    document.body.style.overflow = '';
+    document.title = baseTitle;
+    openedInApp = false;
+  }
+
+  function openEntry(id, toShare) {
+    const e = findEntry(id);
+    if (!e) return;
+    openedInApp = true;
+    if (location.hash.slice(1) === hashFor(e)) { showReader(e, toShare); return; }
+    location.hash = hashFor(e);
+    if (toShare) setTimeout(() => { const box = document.getElementById('share-box'); if (box) readerEl.scrollTop = box.offsetTop - 80; }, 60);
+  }
+
+  function closeReader() {
+    if (openedInApp) {
+      history.back();
+    } else {
+      history.replaceState(null, '', location.pathname + location.search);
+      hideReader();
+    }
+  }
+
+  function handleHash() {
+    const id = decodeURIComponent((location.hash || '').slice(1));
+    if (!id) { hideReader(); return; }
+    const e = findEntry(id);
+    if (e) showReader(e);
+    else if (ENTRIES.length) hideReader();
+  }
+
+  document.addEventListener('click', ev => {
+    const copyBtn = ev.target.closest('[data-copy]');
+    if (copyBtn) { const e = findEntry(copyBtn.dataset.copy); if (e) copyLink(e); return; }
+    const shareBtn = ev.target.closest('[data-share]');
+    if (shareBtn) { const e = findEntry(shareBtn.dataset.share); if (e) doShare(e); return; }
+    const openEl = ev.target.closest('[data-open]');
+    if (openEl) openEntry(openEl.dataset.open);
+  });
+  document.addEventListener('keydown', ev => {
+    if (ev.key === 'Escape' && readerEl.classList.contains('open')) { closeReader(); return; }
+    if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches && ev.target.matches('[data-open][role="button"]')) {
+      ev.preventDefault();
+      openEntry(ev.target.dataset.open);
+    }
+  });
+  document.getElementById('reader-close').addEventListener('click', closeReader);
+  window.addEventListener('hashchange', handleHash);
+
+  if (location.hash.length > 1) {
+    readerEl.className = 'reader open';
+    readerContent.innerHTML = '<div class="empty-state">Opening...</div>';
+    document.body.style.overflow = 'hidden';
+  }
+
+  const loadPromise = loadAllContent().then(handleHash);
+
+  // ===== BASIC PDF (backup if the designed one cannot be made) =====
   function wrapText(doc, text, x, y, maxWidth, lineHeight) {
     const lines = doc.splitTextToSize(text, maxWidth);
     lines.forEach(line => {
@@ -804,14 +1221,13 @@
     trackedText(doc, 'fieldnoticmagazine.netlify.app', cx, H - 92, 1);
   }
 
-  async function generateIssuePDF(issueName) {
+  async function generateIssuePDFBasic(issueName) {
     const btn = document.getElementById('download-issue-btn');
     const originalText = btn.textContent;
     btn.textContent = 'Preparing...';
 
     try {
-      const all = await fetchIssueEntries();
-      const issueEntries = all.filter(e => (e.meta.issue || 'Issue One') === issueName);
+      const issueEntries = ENTRIES.filter(e => (e.meta.issue || 'Issue One') === issueName);
 
       if (issueEntries.length === 0) {
         alert('Nothing has been published in this issue yet.');
@@ -1000,6 +1416,253 @@
       doc.save(`Fieldnotic - ${issueName}.pdf`);
     } catch (err) {
       alert('Something went wrong preparing the PDF. Please try again.');
+    }
+    btn.textContent = originalText;
+  }
+
+  // ===== DESIGNED PDF ISSUE =====
+  function toEl(html) {
+    const d = document.createElement('div');
+    d.innerHTML = html.trim();
+    return d.firstChild;
+  }
+
+  function frameHTML() { return '<div class="frame"></div><div class="frame2"></div>'; }
+
+  function buildCover(issueName) {
+    const p = document.createElement('div');
+    p.className = 'pp cover';
+    p.innerHTML = `${frameHTML()}
+      <img class="cv-lily" src="lily.png" alt="">
+      <div class="cv-title">
+        <div class="cv-issue">${esc(issueName)}</div>
+        <h1>Fieldnotic</h1>
+        <div class="cv-rule"></div>
+        <p class="cv-tag">A magazine of poetry,<br>short fiction, and articles</p>
+      </div>
+      <div class="cv-foot">Free to read. Free to submit. Writers keep their rights.</div>`;
+    return p;
+  }
+
+  function buildBack() {
+    const p = document.createElement('div');
+    p.className = 'pp back';
+    p.innerHTML = `${frameHTML()}
+      <div class="bk-in">
+        <h2>Write for Fieldnotic</h2>
+        <p>We read all year round. Send poems, short fiction, or articles, in English or French.</p>
+        <p>It is free to submit, you keep every right to your work, and we publish human voices only.</p>
+        <div class="em">fieldnoticmagazine@gmail.com</div>
+      </div>
+      <div class="bk-site">fieldnoticmagazine.netlify.app</div>`;
+    return p;
+  }
+
+  function buildContents(issueName, toc) {
+    const groups = [['poetry', 'Poems'], ['fiction', 'Stories'], ['articles', 'Articles']];
+    let rows = '';
+    groups.forEach(g => {
+      const items = toc.filter(t => t.e.key === g[0]);
+      if (!items.length) return;
+      rows += `<div class="grp">${g[1]}</div>`;
+      items.forEach(t => {
+        rows += `<div class="row"><span class="t">${esc(t.e.meta.title || 'Untitled')}</span><span class="lead"></span><span class="n">${t.firstIndex + 1}</span></div>
+                 <div class="au">${esc(t.e.meta.author || '')}</div>`;
+      });
+    });
+    const p = document.createElement('div');
+    p.className = 'pp toc';
+    p.innerHTML = `<div class="toc-issue">${esc(issueName)}</div><h2>In this issue</h2><div class="toc-rule"></div>${rows}`;
+    return p;
+  }
+
+  function makePiecePage(e, issueName) {
+    const p = document.createElement('div');
+    p.className = 'pp piece ' + e.key;
+    p.innerHTML = `<div class="runhead"><span>Fieldnotic</span><span>${esc(issueName)}</span></div><div class="pbody"></div><div class="pfoot"></div>`;
+    return p;
+  }
+
+  function fits(body) { return body.scrollHeight <= body.clientHeight + 1; }
+
+  function paginatePiece(e, issueName, stage) {
+    const pages = [];
+    let page, body;
+    const startPage = () => {
+      if (page) page.style.display = 'none';
+      page = makePiecePage(e, issueName);
+      stage.appendChild(page);
+      page.style.display = 'block';
+      body = page.querySelector('.pbody');
+      pages.push(page);
+    };
+    startPage();
+    const m = e.meta;
+    body.insertAdjacentHTML('beforeend',
+      `<div class="kind">${TYPE[e.key].one}</div><h2 class="ptitle">${esc(m.title || 'Untitled')}</h2><div class="pauthor">${esc(m.author || '')}</div><div class="prule"></div>`);
+
+    const blocks = parseBlocks(e);
+    // Drop cap on the first paragraph of stories and articles
+    if (e.key !== 'poetry') {
+      const first = blocks.find(b => b.kind === 'p');
+      if (first && /^[A-Za-z\u00C0-\u00FF]/.test(first.html)) {
+        first.html = `<span class="drop">${first.html[0]}</span>${first.html.slice(1)}`;
+      }
+    }
+
+    const placeWhole = (html) => {
+      const el = toEl(html);
+      body.appendChild(el);
+      if (!fits(body)) { body.removeChild(el); startPage(); body.appendChild(el); }
+    };
+
+    blocks.forEach(b => {
+      if (b.kind === 'stanza') placeWhole(`<div class="stanza">${b.html}</div>`);
+      else if (b.kind === 'h') placeWhole(`<h3>${b.html}</h3>`);
+      else if (b.kind === 'quote') placeWhole(`<blockquote>${b.html}</blockquote>`);
+      else if (b.kind === 'p') {
+        const whole = toEl(`<p>${b.html}</p>`);
+        body.appendChild(whole);
+        if (fits(body)) return;
+        body.removeChild(whole);
+        let rest = b.html.split(' ');
+        while (rest.length) {
+          let lo = 0, hi = rest.length;
+          while (lo < hi) {
+            const mid = Math.ceil((lo + hi) / 2);
+            const t = toEl(`<p>${rest.slice(0, mid).join(' ')}</p>`);
+            body.appendChild(t);
+            const ok = fits(body);
+            body.removeChild(t);
+            if (ok) lo = mid; else hi = mid - 1;
+          }
+          if (lo >= rest.length) { body.appendChild(toEl(`<p>${rest.join(' ')}</p>`)); break; }
+          if (lo < 8 && body.children.length > 0) { startPage(); continue; }
+          lo = Math.max(lo, 1);
+          body.appendChild(toEl(`<p>${rest.slice(0, lo).join(' ')}</p>`));
+          rest = rest.slice(lo);
+          startPage();
+        }
+      }
+    });
+
+    if (m.bio) placeWhole(`<div class="pbio">${esc(m.bio)}</div>`);
+    page.style.display = 'none';
+    return pages;
+  }
+
+  // Builds every page of the issue: cover, contents, pieces, back cover
+  function buildIssuePages(issueName, entries, stage) {
+    const order = { poetry: 0, fiction: 1, articles: 2 };
+    const sorted = entries.slice().sort((a, b) => {
+      const byType = (order[a.key] ?? 9) - (order[b.key] ?? 9);
+      if (byType !== 0) return byType;
+      return (new Date(a.meta.date) - new Date(b.meta.date)) || 0;
+    });
+    const pages = [];
+    const toc = [];
+    const cover = buildCover(issueName);
+    stage.appendChild(cover);
+    pages.push(cover);
+    pages.push(null); // contents goes here once page numbers are known
+    sorted.forEach(e => {
+      toc.push({ e, firstIndex: pages.length });
+      paginatePiece(e, issueName, stage).forEach(p => pages.push(p));
+    });
+    const back = buildBack();
+    stage.appendChild(back);
+    pages.push(back);
+    const contents = buildContents(issueName, toc);
+    stage.appendChild(contents);
+    pages[1] = contents;
+    pages.forEach((p, i) => {
+      const num = p.querySelector('.pfoot');
+      if (num) num.textContent = String(i + 1);
+    });
+    return { pages, toc };
+  }
+
+  async function fontsReady() {
+    try {
+      await Promise.race([
+        Promise.all([
+          document.fonts.load('600 60px Fraunces'),
+          document.fonts.load('500 40px Fraunces'),
+          document.fonts.load('italic 400 20px Fraunces'),
+          document.fonts.load('400 20px "Source Serif 4"'),
+          document.fonts.load('italic 400 20px "Source Serif 4"')
+        ]).then(() => document.fonts.ready),
+        new Promise(r => setTimeout(r, 6000))
+      ]);
+    } catch (_) {}
+  }
+
+  const nextFrame = () => new Promise(r => requestAnimationFrame(() => setTimeout(r, 30)));
+
+  async function generateIssuePDF(issueName) {
+    const btn = document.getElementById('download-issue-btn');
+    const originalText = btn.textContent;
+    btn.textContent = 'Preparing...';
+    let overlay = null, stage = null;
+    const cleanup = () => {
+      if (overlay) overlay.remove();
+      if (stage) stage.remove();
+      overlay = stage = null;
+    };
+
+    try {
+      await loadPromise;
+      const issueEntries = ENTRIES.filter(e => (e.meta.issue || 'Issue One') === issueName);
+      if (issueEntries.length === 0) {
+        alert('Nothing has been published in this issue yet.');
+        btn.textContent = originalText;
+        return;
+      }
+      if (!window.html2canvas || !window.jspdf) throw new Error('PDF tools did not load');
+
+      overlay = document.createElement('div');
+      overlay.id = 'pdf-overlay';
+      overlay.innerHTML = '<div>Preparing your issue</div><div class="pg" id="pdf-progress">Setting the pages</div>';
+      document.body.appendChild(overlay);
+      window.scrollTo(0, 0);
+
+      stage = document.createElement('div');
+      stage.id = 'pdf-stage';
+      document.body.appendChild(stage);
+
+      await fontsReady();
+      const { pages } = buildIssuePages(issueName, issueEntries, stage);
+
+      // Wait for the cover art to load
+      await Promise.all(Array.from(stage.querySelectorAll('img')).map(img =>
+        img.complete ? null : new Promise(r => { img.onload = img.onerror = r; })));
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'pt', format: 'a4', compress: true });
+      const W = doc.internal.pageSize.getWidth();
+      const H = doc.internal.pageSize.getHeight();
+      const prog = document.getElementById('pdf-progress');
+
+      for (let i = 0; i < pages.length; i++) {
+        prog.textContent = 'Page ' + (i + 1) + ' of ' + pages.length;
+        const page = pages[i];
+        page.style.display = 'block';
+        await nextFrame();
+        const canvas = await window.html2canvas(page, {
+          scale: 2, useCORS: true, backgroundColor: null, logging: false,
+          scrollX: 0, scrollY: 0, windowWidth: 794
+        });
+        page.style.display = 'none';
+        if (i > 0) doc.addPage();
+        doc.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, W, H);
+      }
+
+      doc.save('Fieldnotic - ' + issueName + '.pdf');
+      cleanup();
+    } catch (err) {
+      console.error(err);
+      cleanup();
+      try { await generateIssuePDFBasic(issueName); } catch (_) { alert('Something went wrong preparing the PDF. Please try again.'); }
     }
     btn.textContent = originalText;
   }
