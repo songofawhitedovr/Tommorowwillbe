@@ -10,26 +10,36 @@ excerpt: A satirical poem exploring royalty, class, revolution, and political
   masquerades, where the clown becomes a symbol of power and ridicule turns into
   the ultimate performance.
 ---
-###   The Ridicule
+**The Ridicule**
 
 This clown made of irony,
+
 Is just a mere representation
+
 Of the glory of royalty.
 
 Out of guilt, 
+
 The pauper hides his own history
+
 To the troubadour
+
 Who writes with his own right.
 
 Despite resistance from the revolutionaries,
+
 And oppression from the opposition,
 
 The fanfare of the funfair
+
 Is open to all!
 
 Meanwhile, the masquerades
+
 Fill the scene in more suspense!
 
 In this ounce of charades,
+
 The main character decides to resign,
+
 Calling it quit to quill!
