@@ -9,8 +9,6 @@ date: 2026-11-01T16:39:00.000+05:30
 excerpt: A melancholic reflection on suffering, despair, and the irrational
   pursuit of joy.
 ---
- **\    La grinçante mélodie** 
-
 Emballés par cette symphonie de douleur,
 
 Nos âmes égarées pleurent le néant.
