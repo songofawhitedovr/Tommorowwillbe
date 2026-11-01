@@ -10,8 +10,6 @@ excerpt: A satirical poem exploring royalty, class, revolution, and political
   masquerades, where the clown becomes a symbol of power and ridicule turns into
   the ultimate performance.
 ---
-**The Ridicule**
-
 This clown made of irony,
 
 Is just a mere representation
