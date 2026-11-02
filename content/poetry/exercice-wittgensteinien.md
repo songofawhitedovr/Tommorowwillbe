@@ -1,7 +1,6 @@
 ---
 title: Exercice Wittgensteinien
-author: Jean-Martin is a wandering thinker and poet who explores the depths of
-  the human experience through poetic creation.
+author: "Jean-Martin "
 bio: >
   Jean-Martin is a wandering thinker and poet who explores the depths of the
   human experience through poetic creation.
