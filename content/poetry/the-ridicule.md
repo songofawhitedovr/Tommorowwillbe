@@ -5,14 +5,14 @@ bio: Alshaad Kara is a Mauritian poet who writes from his heart. He won the 2nd
   Prix TB at the 2026 18e concours Gens du monde. His latest poems were
   published in “Caractère” and “Poetry Planetariat”.
 issue: Issue One
-date: 2026-11-01T11:52:00.000+05:30
+date: 2026-11-02T08:55:00.000+05:30
 excerpt: A satirical poem exploring royalty, class, revolution, and political
   masquerades, where the clown becomes a symbol of power and ridicule turns into
   the ultimate performance.
 ---
 This clown made of irony,
 
-Is just a mere representation
+Is just a mere representation 
 
 Of the glory of royalty.
 
